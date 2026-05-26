@@ -1,0 +1,40 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<title>Smart Task Manager</title>
+</head>
+<body>
+<h1>Smart Task Manager</h1>
+<input id="taskInput" placeholder="Enter task"/>
+<button onclick="addTask()">Add</button>
+<ul id="list"></ul>
+
+<script>
+async function load(){
+  const res = await fetch('/api/tasks');
+  const data = await res.json();
+  const list = document.getElementById('list');
+  list.innerHTML='';
+  data.forEach(t=>{
+    const li=document.createElement('li');
+    li.innerHTML = t.text + ' <button onclick="del('+t.id+')">x</button>';
+    list.appendChild(li);
+  });
+}
+
+async function addTask(){
+  const text=document.getElementById('taskInput').value;
+  await fetch('/api/tasks',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text})});
+  load();
+}
+
+async function del(id){
+  await fetch('/api/tasks/'+id,{method:'DELETE'});
+  load();
+}
+
+load();
+</script>
+</body>
+</html>
